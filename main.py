@@ -13,14 +13,16 @@ with open('pokedex.html') as f:
 
 pokedex_table = soup.find(id="pokedex").find("tbody")
 # for poke in pokedex_table.find_all("tr")[0:5]:
-#   print(len(poke), type(poke))
-#   print(poke.find(class_="infocard-cell-data"))
+#   print(poke.select_one(".cell-name small"))
 
 def pokemon_stat(pokedex):
   pokemons = []
   for tr in pokedex.find_all("tr"):
     p_id = tr.select_one("td .infocard-cell-data").string
-    name = tr.select_one(".cell-name a").string
+    if tr.select_one(".cell-name small"):
+      name = tr.select_one(".cell-name small").string
+    else:
+      name = tr.select_one(".cell-name a").string
     types = [i.string for i in tr.select(".cell-icon a")]
     total = tr.select_one('.cell-total').string
     hp, attack, defense, special_attack, special_defense, speed =\
@@ -41,6 +43,7 @@ def pokemon_stat(pokedex):
   return pokemons
 
 df = pd.DataFrame(pokemon_stat(pokedex_table))
+print(df.head(10))
 df.to_csv('pokedex.csv', index=False)
 
 poke = pd.read_csv('pokedex.csv')
